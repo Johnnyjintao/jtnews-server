@@ -1,4 +1,6 @@
 # jtnews-server
+#### 正在完善，敬请期待（50%）！
+> 你的 "Star" 是我最大的动力！🌹
 ## 一、项目介绍
 
 - 技术栈：Nodejs, MySQL; Koa2, Sequelize, jwt.
