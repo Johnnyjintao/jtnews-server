@@ -44,18 +44,12 @@ class categoryController {
         try {
             let req = ctx.request.body;
             let name = req.name;
-            let offset = req.offset;
-            let limit = req.limit;
-            if(offset==='' || limit===''){
-                ctx.response.status = 412;
-                ctx.body = statusCode.ERROR_412({
-                    msg: '请检查参数！'
-                })
-            }else{
-                const data = await CategoryModel.getCategoryList(offset,limit,name);
-                ctx.response.status = 200;
-                ctx.body = statusCode.SUCCESS_200(200,'查询分类列表成功！', data);
-            }
+            let offset = req.offset || 10;
+            let limit = req.limit || 0;
+
+            const data = await CategoryModel.getCategoryList(offset,limit,name);
+            ctx.response.status = 200;
+            ctx.body = statusCode.SUCCESS_200(200,'查询分类列表成功！', data);
         } catch (e) {
 
             ctx.response.status = 412;

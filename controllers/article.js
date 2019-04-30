@@ -16,14 +16,15 @@ class articleController {
      */
     static async create(ctx) {
         let req = ctx.request.body;
-
-        if (req.title
-            && req.author
-            && req.categoryId
-            && req.banner
-            && req.content
-            && req.state
-        ) {
+        if(req.state == 'draft' && req.title){
+            if(req.article_id){
+                await ArticleModel.updateArticle(req)
+            }else{
+                await ArticleModel.createArticle(req);
+            }
+            ctx.response.status = 200;
+            ctx.body = statusCode.SUCCESS_200(200, '成功');
+        }else if(req.state == 'article' && req.title && req.author && req.categoryId && req.banner && req.content){
             try {
                 req.banner = JSON.stringify(req.banner);
                 // 查询分类是否存在
@@ -37,17 +38,17 @@ class articleController {
 
                 } else {
                     ctx.response.status = 412;
-                    ctx.body = statusCode.ERROR_412({
-                        msg: '缺少此文章分类，请重新创建分类: ' + req.category
-                    })
+                    ctx.body = statusCode.ERROR_412('缺少此文章分类，请重新创建分类: ' + req.category)
                     return false;
                 }
-
-                const ret = await ArticleModel.createArticle(req);
-                const data = await ArticleModel.getArticleDetail(ret.id);
+                if(req.article_id){
+                    await ArticleModel.updateArticle(req)
+                }else {
+                    await ArticleModel.createArticle(req);
+                }
 
                 ctx.response.status = 200;
-                ctx.body = statusCode.SUCCESS_200('创建文章成功', data);
+                ctx.body = statusCode.SUCCESS_200(200, '成功');
 
             } catch (err) {
                 ctx.response.status = 412;
@@ -56,7 +57,7 @@ class articleController {
                     err,
                 })
             }
-        } else {
+        }else{
             ctx.response.status = 412;
             ctx.body = statusCode.ERROR_412({
                 msg: '请检查参数！'
@@ -109,9 +110,12 @@ class articleController {
     static async search(ctx) {
         try {
             let req = ctx.request.body;
-            let data = await ArticleModel.search(req);
+            let name = req.name || '';
+            let offset = req.offset || 10;
+            let limit = req.limit || 0;
+            let data = await ArticleModel.search(name,offset,limit);
             ctx.response.status = 200;
-            ctx.body = statusCode.SUCCESS_200('查询文章成功！', data)
+            ctx.body = statusCode.SUCCESS_200(200,'查询文章成功！', data);
         } catch (e) {
             console.log(e);
             ctx.response.status = 412;
@@ -143,15 +147,14 @@ class articleController {
      * @returns {Promise.<void>}
      */
     static async detail(ctx) {
-        let id = ctx.params.id;
+        let req = ctx.request.body;
+        let id = req.id;
 
         if (id) {
             try {
                 let data = await ArticleModel.getArticleDetail(id);
                 ctx.response.status = 200;
-                ctx.body = statusCode.SUCCESS_200('查询成功！', {
-                    data
-                });
+                ctx.body = statusCode.SUCCESS_200(200,'查询文章成功！', data);
 
             } catch (err) {
                 ctx.response.status = 412;
@@ -173,7 +176,8 @@ class articleController {
      * @returns {Promise.<void>}
      */
     static async delete(ctx) {
-        let id = ctx.params.id;
+        let req = ctx.request.body;
+        let id = req.id;
 
         if (id && !isNaN(id)) {
             try {

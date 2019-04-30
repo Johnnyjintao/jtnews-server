@@ -20,7 +20,7 @@ class ArticleModel {
             title: data.title,
             author: data.author|| '',
             categoryId: data.categoryId|| '',
-            banner: data.banner|| '',
+            banner: ''+data.banner|| '',
             content: data.content|| '',
             state:data.state
         })
@@ -32,20 +32,19 @@ class ArticleModel {
      * @param data  事项的状态
      * @returns {Promise.<boolean>}
      */
-    static async updateArticle(id, data) {
+    static async updateArticle(data) {
         await Article.update({
             title: data.title,
-            author: data.author,
-            introduce: data.introduce,
-            category: data.category,
-            banner: data.banner,
-            recommend: data.recommend,
-            content: data.content
+            author: data.author|| '',
+            categoryId: data.categoryId|| '',
+            banner: ''+data.banner|| '',
+            content: data.content|| '',
+            state:data.state
         }, {
             where: {
-                id
+                id:data.article_id
             },
-            fields: ['title', 'author', 'introduce', 'category', 'banner', 'content', 'recommend']
+            fields: ['title', 'author', 'categoryId', 'banner', 'banner', 'content', 'state']
         });
         return true
     }
@@ -55,16 +54,18 @@ class ArticleModel {
      * @param params
      * @return {Promise<void>}
      */
-    static async search(params) {
+    static async search(name,limit,offset) {
         return await Article.findAll({
             raw: true,
             'order': [
                 ['id', 'DESC']
             ],
+            limit:limit,
+            offset:offset,
             where: {
                 title: {
                     // 模糊查询
-                    [Op.like]: '%' + params.keyword + '%'
+                    [Op.like]: '%' + name + '%'
                 }
             },
             attributes: {exclude: ['content']}

@@ -47,6 +47,9 @@ router.post('/article/save_article', ArticleController.save)
 
 router.post('/article/query_article', ArticleController.search)
 
+router.post('/article/query_article_detail', ArticleController.detail)
+
+router.post('/article/del_article', ArticleController.delete)
 
 router.post('/category/create_category', CategoryController.create)
 

@@ -5,7 +5,7 @@ const app = new Koa()
 const bodyparser = require('koa-bodyparser')
 const jwt = require('koa-jwt')
 const cors = require('koa-cors');
-const index = require('./routes/index')
+const index = require('./routes')
 const secret = require('./config/secret')
 // const err = require('./middlreware/error')
 
